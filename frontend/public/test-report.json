@@ -1,0 +1,28 @@
+{
+  "passed": 4,
+  "failed": 0,
+  "coverage": 93,
+  "generatedAt": "2026-04-06T14:46:22.177Z",
+  "durationMs": 16152,
+  "unitOk": true,
+  "e2eOk": true,
+  "details": {
+    "unit": {
+      "command": "npm run test:unit:coverage",
+      "passed": 3,
+      "failed": 0,
+      "info": "Unit tests validate stores/components and generate coverage summary."
+    },
+    "e2e": {
+      "command": "npm run test:e2e:report",
+      "passed": 1,
+      "failed": 0,
+      "info": "E2E verifies scenario: catalog -> add to cart -> checkout."
+    },
+    "methodology": [
+      "Run unit tests with coverage (Vitest).",
+      "Run browser flow tests (Playwright).",
+      "Merge results into one JSON report for educational view."
+    ]
+  }
+}

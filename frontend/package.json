@@ -1,0 +1,30 @@
+{
+  "name": "confeti-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "test:unit": "vitest run --reporter=verbose",
+    "test:unit:coverage": "vitest run --coverage --reporter=verbose --coverage.reporter=text --coverage.reporter=json-summary",
+    "test:e2e": "playwright test --reporter=line",
+    "test:e2e:report": "playwright test --reporter=json",
+    "test:ui": "node scripts/test-ui.mjs"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/playfair-display": "^5.2.8",
+    "@pinia/nuxt": "^0.11.3",
+    "nuxt": "^3.14.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.7.4",
+    "@vitest/coverage-v8": "^2.1.2",
+    "sass": "^1.79.5",
+    "vitest": "^2.1.2"
+  }
+}
