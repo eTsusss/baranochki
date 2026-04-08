@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { isValidImageUrl, productFallbackImage } from "../utils/images";
+import { decodeJwtPayload } from "../utils/jwt";
+import type { FetchError } from "ofetch";
 
 definePageMeta({ middleware: "auth" });
 
@@ -16,6 +18,7 @@ type Product = {
 const config = useRuntimeConfig();
 const auth = useAuthStore();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
+const isAdmin = computed(() => decodeJwtPayload(auth.token || "")?.role === "admin");
 
 const { data: products, refresh: refreshProducts } = await useFetch<Product[]>(`${config.public.apiBase}/products`);
 const { data: orders, refresh: refreshOrders } = await useFetch(`${config.public.apiBase}/orders`, {
@@ -50,6 +53,16 @@ const info = ref("");
 const error = ref("");
 const editSectionRef = ref<HTMLElement | null>(null);
 const editNameInputRef = ref<HTMLInputElement | null>(null);
+
+function handleAuthError(err: unknown): boolean {
+  const status = (err as FetchError)?.statusCode || (err as FetchError)?.response?.status;
+  if (status === 401 || status === 403) {
+    auth.logout();
+    navigateTo("/login");
+    return true;
+  }
+  return false;
+}
 
 async function toDataUrl(file: File): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -117,7 +130,8 @@ async function addProduct() {
     resetCreateForm();
     await refreshProducts();
     info.value = "Товар добавлен";
-  } catch {
+  } catch (err) {
+    if (handleAuthError(err)) return;
     error.value = "Не удалось добавить товар";
   }
 }
@@ -142,7 +156,8 @@ async function updateProduct() {
     await refreshProducts();
     info.value = "Товар обновлён";
     cancelEdit();
-  } catch {
+  } catch (err) {
+    if (handleAuthError(err)) return;
     error.value = "Не удалось обновить товар";
   }
 }
@@ -159,18 +174,24 @@ async function deleteProduct(productId: number) {
     if (editForm.id === productId) cancelEdit();
     await refreshProducts();
     info.value = "Товар удалён";
-  } catch {
+  } catch (err) {
+    if (handleAuthError(err)) return;
     error.value = "Не удалось удалить товар";
   }
 }
 
 async function setStatus(orderId: number, status: string) {
-  await $fetch(`${config.public.apiBase}/orders/${orderId}/status`, {
-    method: "PATCH",
-    headers: authHeaders.value,
-    body: { status }
-  });
-  await refreshOrders();
+  try {
+    await $fetch(`${config.public.apiBase}/orders/${orderId}/status`, {
+      method: "PATCH",
+      headers: authHeaders.value,
+      body: { status }
+    });
+    await refreshOrders();
+  } catch (err) {
+    if (handleAuthError(err)) return;
+    error.value = "Не удалось обновить статус заказа";
+  }
 }
 
 function openReport() {
@@ -180,7 +201,11 @@ function openReport() {
 watch(
   () => auth.token,
   async (token) => {
-    if (!token) return;
+    if (!token || !isAdmin.value) {
+      auth.logout();
+      navigateTo("/login");
+      return;
+    }
     await Promise.all([refreshOrders(), refreshUsers()]);
   },
   { immediate: true }

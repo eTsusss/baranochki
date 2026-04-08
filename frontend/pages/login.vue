@@ -1,4 +1,6 @@
 ﻿<script setup lang="ts">
+import { decodeJwtPayload } from "../utils/jwt";
+
 const config = useRuntimeConfig();
 const auth = useAuthStore();
 const mode = ref<"login" | "register">("login");
@@ -14,7 +16,8 @@ async function submit() {
       body: { email: email.value, password: password.value }
     });
     auth.setToken(res.access_token);
-    navigateTo("/profile");
+    const role = decodeJwtPayload(res.access_token)?.role;
+    navigateTo(role === "admin" ? "/cabinet-upravleniya-87" : "/profile");
   } catch {
     error.value = "Неверный логин или пароль";
   }
