@@ -972,3 +972,158 @@ h3 {
   .container { padding: 14px; }
   .card { padding: 14px; }
 }
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 16px;
+  }
+
+  .site-header {
+    gap: 10px;
+  }
+
+  .brand strong {
+    font-size: 15px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .list-item {
+    align-items: flex-start;
+  }
+
+  .action-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .brand strong {
+    font-size: 14px;
+  }
+
+  .brand small {
+    font-size: 11px;
+  }
+
+  .burger {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .site-nav {
+    display: none;
+    width: 100%;
+    margin-top: 8px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .site-nav--open {
+    display: flex;
+  }
+
+  .site-nav__link {
+    width: 100%;
+    text-align: center;
+    padding: 10px 12px;
+  }
+
+  .hero-soul__slide,
+  .hero-soul__overlay,
+  .hero-bakery__slide,
+  .hero-bakery__overlay {
+    min-height: 320px;
+  }
+
+  .hero-soul__overlay,
+  .hero-bakery__overlay {
+    padding: 18px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .list-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .qty-controls {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .qty-input {
+    width: 100%;
+    max-width: 120px;
+  }
+
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-total-wrap {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .promo-row {
+    gap: 10px;
+  }
+
+  .product-card__media,
+  .product-card__media img {
+    height: 180px;
+    min-height: 180px;
+  }
+
+  .thankyou-modal__card {
+    margin: 0 12px;
+    padding: 18px;
+  }
+}
