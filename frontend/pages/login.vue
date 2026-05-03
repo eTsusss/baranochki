@@ -1,4 +1,5 @@
 ﻿<script setup lang="ts">
+import { joinApiBase } from "~/utils/api-url";
 import { decodeJwtPayload } from "../utils/jwt";
 
 const config = useRuntimeConfig();
@@ -11,7 +12,7 @@ const error = ref("");
 async function submit() {
   error.value = "";
   try {
-    const res = await $fetch<{ access_token: string }>(`${config.public.apiBase}/auth/${mode.value}`, {
+    const res = await $fetch<{ access_token: string }>(joinApiBase(config.public.apiPrefix, "auth", mode.value), {
       method: "POST",
       body: { email: email.value, password: password.value }
     });

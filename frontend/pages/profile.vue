@@ -1,5 +1,6 @@
 ﻿<script setup lang="ts">
 import { logoutRedirectHome } from "~/composables/useLogout";
+import { joinApiBase } from "~/utils/api-url";
 import { decodeJwtPayload } from "../utils/jwt";
 
 definePageMeta({ middleware: "auth" });
@@ -7,11 +8,11 @@ const config = useRuntimeConfig();
 const auth = useAuthStore();
 if (import.meta.client) auth.load();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
-const { data: orders, refresh } = await useFetch(`${config.public.apiBase}/orders/me`, {
+const { data: orders, refresh } = await useFetch(joinApiBase(config.public.apiPrefix, "orders", "me"), {
   server: false,
   headers: authHeaders
 });
-const { data: products } = await useFetch(`${config.public.apiBase}/products`);
+const { data: products } = await useFetch(joinApiBase(config.public.apiPrefix, "products"));
 
 const user = computed(() => decodeJwtPayload(auth.token || "") || {});
 const expandedOrderId = ref<number | null>(null);

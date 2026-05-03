@@ -24,9 +24,9 @@ if (import.meta.client) auth.load();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
 const isAdmin = computed(() => decodeJwtPayload(auth.token || "")?.role === "admin");
 
-const productsUrl = joinApiBase(config.public.apiBase, "products");
-const ordersUrl = joinApiBase(config.public.apiBase, "orders");
-const adminUsersUrl = joinApiBase(config.public.apiBase, "admin", "users");
+const productsUrl = joinApiBase(config.public.apiPrefix, "products");
+const ordersUrl = joinApiBase(config.public.apiPrefix, "orders");
+const adminUsersUrl = joinApiBase(config.public.apiPrefix, "admin", "users");
 
 const { data: products, refresh: refreshProducts } = await useFetch<Product[]>(productsUrl);
 const { data: orders, refresh: refreshOrders } = await useFetch(ordersUrl, {
@@ -179,7 +179,7 @@ async function updateProduct() {
     return;
   }
   try {
-    await browserJsonFetch(joinApiBase(config.public.apiBase, "products", String(editForm.id)), {
+    await browserJsonFetch(joinApiBase(config.public.apiPrefix, "products", String(editForm.id)), {
       method: "PUT",
       bearer: auth.token,
       body: {
@@ -209,7 +209,7 @@ async function deleteProduct(productId: number) {
     return;
   }
   try {
-    await browserJsonFetch(joinApiBase(config.public.apiBase, "products", String(productId)), {
+    await browserJsonFetch(joinApiBase(config.public.apiPrefix, "products", String(productId)), {
       method: "DELETE",
       bearer: auth.token
     });
@@ -225,7 +225,7 @@ async function deleteProduct(productId: number) {
 async function setStatus(orderId: number, status: string) {
   if (!auth.token?.trim()) return;
   try {
-    await browserJsonFetch(joinApiBase(config.public.apiBase, "orders", String(orderId), "status"), {
+    await browserJsonFetch(joinApiBase(config.public.apiPrefix, "orders", String(orderId), "status"), {
       method: "PATCH",
       bearer: auth.token,
       body: { status }

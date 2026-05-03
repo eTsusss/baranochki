@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { joinApiBase } from "~/utils/api-url";
 import type { Product } from "~/types";
 import { isValidImageUrl, productFallbackImage } from "~/utils/images";
 
@@ -6,7 +7,7 @@ const route = useRoute();
 const config = useRuntimeConfig();
 const cart = useCartStore();
 
-const { data: products } = await useFetch<Product[]>(`${config.public.apiBase}/products`);
+const { data: products } = await useFetch<Product[]>(joinApiBase(config.public.apiPrefix, "products"));
 const product = computed(() => (products.value || []).find((p) => p.id === Number(route.params.id)));
 const quantity = ref(1);
 const relatedOffset = ref(0);

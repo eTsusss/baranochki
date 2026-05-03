@@ -1,4 +1,5 @@
 ﻿<script setup lang="ts">
+import { joinApiBase } from "~/utils/api-url";
 import { decodeJwtPayload } from "../utils/jwt";
 
 const cart = useCartStore();
@@ -62,7 +63,7 @@ async function submitOrder() {
   const items = cart.items.map((i) => ({ product_id: i.product.id, quantity: i.quantity }));
 
   try {
-    await $fetch(`${config.public.apiBase}/orders`, {
+    await $fetch(joinApiBase(config.public.apiPrefix, "orders"), {
       method: "POST",
       headers: { Authorization: `Bearer ${auth.token}` },
       body: { ...form, items }

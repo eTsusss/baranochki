@@ -1,4 +1,5 @@
 ﻿<script setup lang="ts">
+import { joinApiBase } from "~/utils/api-url";
 import type { Product } from "~/types";
 
 const config = useRuntimeConfig();
@@ -8,7 +9,7 @@ const sort = ref<"popular" | "priceAsc" | "priceDesc">("popular");
 const expandedFilters = ref(false);
 const visibleCount = ref(8);
 
-const { data: products, pending, refresh } = await useFetch<Product[]>(() => `${config.public.apiBase}/products`, {
+const { data: products, pending, refresh } = await useFetch<Product[]>(() => joinApiBase(config.public.apiPrefix, "products"), {
   query: computed(() => (category.value ? { category: category.value } : {}))
 });
 

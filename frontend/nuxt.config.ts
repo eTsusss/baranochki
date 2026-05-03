@@ -18,12 +18,11 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    /** Реальный URL бэкенда; опционально NUXT_API_UPSTREAM (иначе прокси читает NUXT_PUBLIC_API_BASE на сервере). */
+    apiUpstream: "",
     public: {
-      apiBase: (() => {
-        const raw = process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8000/api";
-        const t = String(raw).trim().replace(/\/+$/, "");
-        return t || "http://localhost:8000/api";
-      })()
+      /** Префикс на этом же хосте ? Nitro проксирует на apiUpstream (нет кросс-доменных POST). */
+      apiPrefix: "/api/be"
     }
   },
   app: {
