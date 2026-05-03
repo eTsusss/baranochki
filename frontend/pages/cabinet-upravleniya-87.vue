@@ -17,6 +17,7 @@ type Product = {
 
 const config = useRuntimeConfig();
 const auth = useAuthStore();
+if (import.meta.client) auth.load();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
 const isAdmin = computed(() => decodeJwtPayload(auth.token || "")?.role === "admin");
 
@@ -201,13 +202,14 @@ function openReport() {
 watch(
   () => auth.token,
   async (token) => {
+    /* На SSR токена нет — иначе immediate срабатывает с token === "" и уводит на /login до гидратации */
+    if (import.meta.server) return;
     if (!token) {
-      await navigateTo("/login");
+      await navigateTo("/login", { replace: true });
       return;
     }
     if (!isAdmin.value) {
-      /* Не вызывать logout: иначе обычный пользователь терял сессию при заходе на URL админки */
-      await navigateTo("/");
+      await navigateTo("/", { replace: true });
       return;
     }
     await Promise.all([refreshOrders(), refreshUsers()]);
