@@ -9,7 +9,7 @@ const { data: orders, refresh } = await useFetch(`${config.public.apiBase}/order
   server: false,
   headers: authHeaders
 });
-const { data: products } = await useFetch(`${config.public.apiBase}/products`, { server: false });
+const { data: products } = await useFetch(`${config.public.apiBase}/products`);
 
 const user = computed(() => decodeJwtPayload(auth.token || "") || {});
 const expandedOrderId = ref<number | null>(null);

@@ -9,7 +9,6 @@ const expandedFilters = ref(false);
 const visibleCount = ref(8);
 
 const { data: products, pending, refresh } = await useFetch<Product[]>(() => `${config.public.apiBase}/products`, {
-  server: false,
   query: computed(() => (category.value ? { category: category.value } : {}))
 });
 

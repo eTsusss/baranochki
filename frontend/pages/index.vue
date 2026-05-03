@@ -3,7 +3,7 @@ import type { Product } from "~/types";
 import { isValidImageUrl, productFallbackImage } from "~/utils/images";
 
 const config = useRuntimeConfig();
-const { data: products, pending } = await useFetch<Product[]>(`${config.public.apiBase}/products`, { server: false });
+const { data: products, pending } = await useFetch<Product[]>(`${config.public.apiBase}/products`);
 const topProducts = computed(() => (products.value || []).slice(0, 8));
 
 const heroSlides = [
