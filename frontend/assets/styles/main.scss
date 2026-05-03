@@ -378,6 +378,18 @@ a.btn {
 .ok-text { color: #1f8a4a; }
 .err-text { color: #b92745; }
 
+.catalog-api-hint {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  background: #fff5f3;
+  border: 1px solid #f0c4bc;
+  border-radius: 12px;
+  code {
+    font-size: 0.9em;
+    word-break: break-all;
+  }
+}
+
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .action-row { display: flex; gap: 8px; }
 .meta-small { font-size: 12px; color: var(--muted); margin-top: 4px; }

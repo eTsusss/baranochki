@@ -4,12 +4,17 @@ import type { Product } from "~/types";
 
 const config = useRuntimeConfig();
 const category = ref("");
-const maxPrice = ref(1500);
+const maxPrice = ref(100_000);
 const sort = ref<"popular" | "priceAsc" | "priceDesc">("popular");
 const expandedFilters = ref(false);
 const visibleCount = ref(8);
 
-const { data: products, pending, refresh } = await useFetch<Product[]>(() => joinApiBase(config.public.apiPrefix, "products"), {
+const {
+  data: products,
+  pending,
+  refresh,
+  error: productsError
+} = await useFetch<Product[]>(() => joinApiBase(config.public.apiPrefix, "products"), {
   query: computed(() => (category.value ? { category: category.value } : {}))
 });
 
@@ -71,7 +76,7 @@ useHead({
 
           <label>
             Максимальная цена: {{ maxPrice }} ₽
-            <input v-model.number="maxPrice" type="range" min="100" max="1500" step="10" />
+            <input v-model.number="maxPrice" type="range" min="100" max="250000" step="100" />
           </label>
 
           <label>
@@ -85,6 +90,12 @@ useHead({
         </div>
       </transition>
     </section>
+
+    <p v-if="productsError" class="err-text catalog-api-hint" data-reveal>
+      Не удалось загрузить товары. Убедитесь, что на Render у фронта задано
+      <strong>NUXT_PUBLIC_API_BASE</strong> — полный URL API, например
+      <code>https://ваш-бэкенд.onrender.com/api</code>
+    </p>
 
     <section class="products-grid" data-reveal>
       <article v-if="pending" v-for="n in 8" :key="`sk-${n}`" class="skeleton-card" />

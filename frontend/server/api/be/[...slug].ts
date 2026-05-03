@@ -10,6 +10,9 @@ export default defineEventHandler((event) => {
     String(config.apiUpstream || "")
       .trim()
       .replace(/\/+$/, "") ||
+    String(config.public.apiBase || "")
+      .trim()
+      .replace(/\/+$/, "") ||
     String(process.env.NUXT_PUBLIC_API_BASE || "")
       .trim()
       .replace(/\/+$/, "") ||
