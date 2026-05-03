@@ -1,4 +1,4 @@
-/** Выход: очистить хранилища и принудительно перезагрузить главную (на том же origin). */
+/** Полный выход: чистим хранилища, сбрасываем Pinia, затем жёсткая перезагрузка главной. */
 export function logoutRedirectHome(): void {
   if (!import.meta.client) return;
 
@@ -6,12 +6,19 @@ export function logoutRedirectHome(): void {
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
   } catch {
-    /* ignore private mode / quota */
+    /* ignore */
   }
 
-  const auth = useAuthStore();
-  auth.logout();
+  try {
+    const auth = useAuthStore();
+    auth.$patch({ token: "", role: "guest" });
+    auth.logout();
+  } catch {
+    /* ignore */
+  }
 
-  const root = `${window.location.origin}/`;
-  window.location.replace(root);
+  const dest = `${window.location.origin}/`;
+  setTimeout(() => {
+    window.location.href = dest;
+  }, 0);
 }

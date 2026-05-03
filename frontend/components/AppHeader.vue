@@ -93,7 +93,7 @@ onBeforeUnmount(() => {
           v-if="auth.token"
           type="button"
           class="site-nav__link site-nav__link--logout"
-          @click.prevent="logoutFromHeader"
+          @click.stop.prevent="logoutFromHeader"
         >
           Выйти
         </button>

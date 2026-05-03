@@ -268,7 +268,7 @@ watch(
           <h1>Панель управления</h1>
           <p>Служебный раздел администратора.</p>
         </div>
-        <button type="button" class="btn btn-secondary" @click.prevent="logoutRedirectHome">Выйти</button>
+        <button type="button" class="btn btn-secondary" @click.stop.prevent="logoutRedirectHome">Выйти</button>
       </div>
       <button type="button" class="btn" @click="openReport">Открыть отчёт тестов</button>
       <p v-if="info" class="ok-text">{{ info }}</p>

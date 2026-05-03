@@ -71,7 +71,7 @@ useHead({
         <h1>Личный кабинет</h1>
         <div class="action-row">
           <button type="button" class="btn btn-secondary" @click="() => refresh()">Обновить</button>
-          <button type="button" class="btn btn-danger" @click.prevent="logout">Выйти</button>
+          <button type="button" class="btn btn-danger" @click.stop.prevent="logout">Выйти</button>
         </div>
       </div>
 
