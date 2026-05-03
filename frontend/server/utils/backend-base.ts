@@ -3,19 +3,22 @@ import { publicBackendHealthUrl } from "../../utils/backend-health";
 
 let warnedLocalhostUpstream = false;
 
-/** Тот же базовый URL API, что и у прокси `/api/be/*`. */
+function trimBase(s: string): string {
+  return String(s || "").trim().replace(/\/+$/, "");
+}
+
+/**
+ * URL бэкенда …/api для прокси `/api/be/*`.
+ * Сначала читаем process.env: на Render он всегда есть в рантайме, даже если
+ * кэш сборки «запёк» пустой public.apiBase в useRuntimeConfig().
+ */
 export function resolveApiBase(event?: H3Event): string {
   const config = event ? useRuntimeConfig(event) : useRuntimeConfig();
   const resolved =
-    String(config.apiUpstream || "")
-      .trim()
-      .replace(/\/+$/, "") ||
-    String(config.public.apiBase || "")
-      .trim()
-      .replace(/\/+$/, "") ||
-    String(process.env.NUXT_PUBLIC_API_BASE || "")
-      .trim()
-      .replace(/\/+$/, "") ||
+    trimBase(process.env.NUXT_API_UPSTREAM || "") ||
+    trimBase(process.env.NUXT_PUBLIC_API_BASE || "") ||
+    trimBase(String(config.apiUpstream || "")) ||
+    trimBase(String(config.public.apiBase || "")) ||
     "http://127.0.0.1:8000/api";
 
   if (

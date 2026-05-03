@@ -21,13 +21,13 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
-    /** Реальный URL бэкенда …/api; задайте NUXT_API_UPSTREAM или NUXT_PUBLIC_API_BASE на Render. */
-    apiUpstream: "",
+    /** Приватный override прокси (не в клиентском бандле). */
+    apiUpstream: process.env.NUXT_API_UPSTREAM || "",
     public: {
       /** Префикс на этом же хосте — Nitro проксирует на apiUpstream/apiBase (без CORS). */
       apiPrefix: "/api/be",
-      /** Дублирует URL бэкенда для прокси (NUXT_PUBLIC_API_BASE). */
-      apiBase: ""
+      /** Публичный URL API; на этапе сборки подставляется из env Render. */
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || ""
     }
   },
   app: {

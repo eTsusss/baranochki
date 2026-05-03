@@ -3,9 +3,13 @@
 Важно: NUXT_PUBLIC_API_BASE задаётся в **сервисе фронта** (Web Service с Nuxt), а не только на бэке.
 Если переменной нет на фронте, прокси /api/be/* и wake уходят на 127.0.0.1 — в логах бэкенда на Render пусто.
 
+После смены env на Render: **Clear build cache & deploy** — иначе в бандле может остаться старый пустой apiBase.
+
 NUXT_PUBLIC_API_BASE=https://<ваш-бэкенд>.onrender.com/api
 
-Тот же URL можно задать как NUXT_API_UPSTREAM (приоритетнее для серверного прокси).
+Тот же URL можно (и полезно) продублировать как NUXT_API_UPSTREAM — приватный override, читается прокси в первую очередь.
+
+Проверка: откройте на **фронте** GET /api/confeti-diag — proxyPointsToRemote должно быть true, envPublicLen > 0.
 
 Без этого прокси /api/be/* уходит на 127.0.0.1 — каталог пустой, вход не работает.
 

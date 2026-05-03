@@ -13,12 +13,21 @@ export default defineNuxtPlugin(() => {
   let lastWakeAt = 0;
   const throttleMs = 10_000;
 
+  function clientPublicApiBase(): string {
+    const fromConfig = String(config.public.apiBase || "").trim();
+    if (fromConfig) return fromConfig;
+    const fromVite = (import.meta as ImportMeta & { env: Record<string, string> }).env
+      .NUXT_PUBLIC_API_BASE;
+    if (fromVite) return String(fromVite).trim();
+    return "";
+  }
+
   function pingWakeBackend() {
     const now = Date.now();
     if (now - lastWakeAt < throttleMs) return;
     lastWakeAt = now;
 
-    const health = publicBackendHealthUrl(String(config.public.apiBase || ""));
+    const health = publicBackendHealthUrl(clientPublicApiBase());
     if (health) {
       void fetch(health, {
         mode: "cors",
