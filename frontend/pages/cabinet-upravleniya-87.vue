@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { logoutRedirectHome } from "~/composables/useLogout";
 import { isValidImageUrl, productFallbackImage } from "../utils/images";
 import { decodeJwtPayload } from "../utils/jwt";
 import { fetchHttpStatus, formatFetchDetail } from "../utils/http-error";
+import { joinApiBase } from "~/utils/api-url";
+import { browserJsonFetch } from "~/utils/browser-fetch";
 
 definePageMeta({ middleware: "auth" });
 
@@ -21,12 +24,16 @@ if (import.meta.client) auth.load();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
 const isAdmin = computed(() => decodeJwtPayload(auth.token || "")?.role === "admin");
 
-const { data: products, refresh: refreshProducts } = await useFetch<Product[]>(`${config.public.apiBase}/products`);
-const { data: orders, refresh: refreshOrders } = await useFetch(`${config.public.apiBase}/orders`, {
+const productsUrl = joinApiBase(config.public.apiBase, "products");
+const ordersUrl = joinApiBase(config.public.apiBase, "orders");
+const adminUsersUrl = joinApiBase(config.public.apiBase, "admin", "users");
+
+const { data: products, refresh: refreshProducts } = await useFetch<Product[]>(productsUrl);
+const { data: orders, refresh: refreshOrders } = await useFetch(ordersUrl, {
   server: false,
   headers: authHeaders
 });
-const { data: users, refresh: refreshUsers } = await useFetch(`${config.public.apiBase}/admin/users`, {
+const { data: users, refresh: refreshUsers } = await useFetch(adminUsersUrl, {
   server: false,
   headers: authHeaders
 });
@@ -141,9 +148,9 @@ async function addProduct() {
     return;
   }
   try {
-    await $fetch(`${config.public.apiBase}/products`, {
+    await browserJsonFetch(productsUrl, {
       method: "POST",
-      headers: { ...authHeaders.value, Accept: "application/json" },
+      bearer: auth.token,
       body: { ...createForm }
     });
     resetCreateForm();
@@ -172,9 +179,9 @@ async function updateProduct() {
     return;
   }
   try {
-    await $fetch(`${config.public.apiBase}/products/${editForm.id}`, {
+    await browserJsonFetch(joinApiBase(config.public.apiBase, "products", String(editForm.id)), {
       method: "PUT",
-      headers: { ...authHeaders.value, Accept: "application/json" },
+      bearer: auth.token,
       body: {
         name: editForm.name,
         description: editForm.description,
@@ -202,9 +209,9 @@ async function deleteProduct(productId: number) {
     return;
   }
   try {
-    await $fetch(`${config.public.apiBase}/products/${productId}`, {
+    await browserJsonFetch(joinApiBase(config.public.apiBase, "products", String(productId)), {
       method: "DELETE",
-      headers: { ...authHeaders.value, Accept: "application/json" }
+      bearer: auth.token
     });
     if (editForm.id === productId) cancelEdit();
     await refreshProducts();
@@ -218,9 +225,9 @@ async function deleteProduct(productId: number) {
 async function setStatus(orderId: number, status: string) {
   if (!auth.token?.trim()) return;
   try {
-    await $fetch(`${config.public.apiBase}/orders/${orderId}/status`, {
+    await browserJsonFetch(joinApiBase(config.public.apiBase, "orders", String(orderId), "status"), {
       method: "PATCH",
-      headers: { ...authHeaders.value, Accept: "application/json" },
+      bearer: auth.token,
       body: { status }
     });
     await refreshOrders();
@@ -261,7 +268,7 @@ watch(
           <h1>Панель управления</h1>
           <p>Служебный раздел администратора.</p>
         </div>
-        <button type="button" class="btn btn-secondary" @click="() => logoutRedirectHome()">Выйти</button>
+        <button type="button" class="btn btn-secondary" @click.prevent="logoutRedirectHome">Выйти</button>
       </div>
       <button type="button" class="btn" @click="openReport">Открыть отчёт тестов</button>
       <p v-if="info" class="ok-text">{{ info }}</p>

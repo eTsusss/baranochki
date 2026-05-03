@@ -19,7 +19,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8000/api"
+      apiBase: (() => {
+        const raw = process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8000/api";
+        const t = String(raw).trim().replace(/\/+$/, "");
+        return t || "http://localhost:8000/api";
+      })()
     }
   },
   app: {

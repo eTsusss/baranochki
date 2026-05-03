@@ -1,9 +1,11 @@
 ﻿<script setup lang="ts">
+import { logoutRedirectHome } from "~/composables/useLogout";
 import { decodeJwtPayload } from "../utils/jwt";
 
 definePageMeta({ middleware: "auth" });
 const config = useRuntimeConfig();
 const auth = useAuthStore();
+if (import.meta.client) auth.load();
 const authHeaders = computed(() => ({ Authorization: `Bearer ${auth.token}` }));
 const { data: orders, refresh } = await useFetch(`${config.public.apiBase}/orders/me`, {
   server: false,
@@ -68,7 +70,7 @@ useHead({
         <h1>Личный кабинет</h1>
         <div class="action-row">
           <button type="button" class="btn btn-secondary" @click="() => refresh()">Обновить</button>
-          <button type="button" class="btn btn-danger" @click="logout">Выйти</button>
+          <button type="button" class="btn btn-danger" @click.prevent="logout">Выйти</button>
         </div>
       </div>
 

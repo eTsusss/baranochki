@@ -1,4 +1,5 @@
 ﻿<script setup lang="ts">
+import { logoutRedirectHome } from "~/composables/useLogout";
 import { decodeJwtPayload } from "../utils/jwt";
 
 const cart = useCartStore();
@@ -92,7 +93,7 @@ onBeforeUnmount(() => {
           v-if="auth.token"
           type="button"
           class="site-nav__link site-nav__link--logout"
-          @click="logoutFromHeader"
+          @click.prevent="logoutFromHeader"
         >
           Выйти
         </button>
