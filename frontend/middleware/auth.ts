@@ -12,6 +12,9 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo("/login", { replace: true });
   }
 
+  /** Pinia после SSR может отставать от localStorage — выравниваем до рендера страницы */
+  useAuthStore().setToken(token);
+
   if (to.path.startsWith(ADMIN_PATH) && payload.role !== "admin") {
     return navigateTo("/", { replace: true });
   }

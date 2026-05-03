@@ -1,4 +1,4 @@
-/** Полный выход: чистим хранилища, сбрасываем Pinia, затем жёсткая перезагрузка главной. */
+/** Выход: чистим хранилища и Pinia, затем полная загрузка /login (обход глюков Vue Router). */
 export function logoutRedirectHome(): void {
   if (!import.meta.client) return;
 
@@ -10,15 +10,11 @@ export function logoutRedirectHome(): void {
   }
 
   try {
-    const auth = useAuthStore();
-    auth.$patch({ token: "", role: "guest" });
-    auth.logout();
+    useAuthStore().logout();
   } catch {
     /* ignore */
   }
 
-  const dest = `${window.location.origin}/`;
-  setTimeout(() => {
-    window.location.href = dest;
-  }, 0);
+  const dest = `${window.location.origin}/login`;
+  window.location.replace(dest);
 }

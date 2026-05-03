@@ -1,8 +1,11 @@
-/* enforce: post — после восстановления Pinia из SSR-пэйлоада, иначе token из LS может затереться пустым состоянием */
+/* enforce: post — после pinia-пэйлоада; app:mounted — после полной гидрации Vue */
 export default defineNuxtPlugin({
   name: "auth-init",
   enforce: "post",
-  setup() {
-    useAuthStore().load();
+  setup(nuxtApp) {
+    const auth = useAuthStore();
+    const sync = () => auth.load();
+    sync();
+    nuxtApp.hook("app:mounted", sync);
   }
 });
