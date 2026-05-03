@@ -1,6 +1,8 @@
-/** Общий выход: очистить Pinia + localStorage и уйти на главную */
-export async function logoutRedirectHome() {
+/** Полный выход: Pinia + localStorage и переход на главную без SPA (надёжно после SSR/Pinia). */
+export function logoutRedirectHome() {
   const auth = useAuthStore();
   auth.logout();
-  await navigateTo("/", { replace: true });
+  if (import.meta.client) {
+    window.location.href = "/";
+  }
 }

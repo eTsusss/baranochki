@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isValidImageUrl, productFallbackImage } from "../utils/images";
 import { decodeJwtPayload } from "../utils/jwt";
-import type { FetchError } from "ofetch";
+import { fetchHttpStatus, formatFetchDetail } from "../utils/http-error";
 
 definePageMeta({ middleware: "auth" });
 
@@ -56,7 +56,7 @@ const editSectionRef = ref<HTMLElement | null>(null);
 const editNameInputRef = ref<HTMLInputElement | null>(null);
 
 async function handleAuthError(err: unknown): Promise<boolean> {
-  const status = (err as FetchError)?.statusCode || (err as FetchError)?.response?.status;
+  const status = fetchHttpStatus(err);
   if (status === 401 || status === 403) {
     auth.logout();
     await navigateTo("/login", { replace: true });
@@ -119,21 +119,39 @@ function cancelEdit() {
   editForm.id = 0;
 }
 
+const MAX_IMAGE_PAYLOAD = 950_000;
+
 async function addProduct() {
   info.value = "";
   error.value = "";
+  if (!auth.token?.trim()) {
+    error.value = "Сессия недействительна — войдите заново.";
+    return;
+  }
+  if (!createForm.name.trim()) {
+    error.value = "Укажите название товара.";
+    return;
+  }
+  if (!Number.isFinite(Number(createForm.price))) {
+    error.value = "Укажите корректную цену.";
+    return;
+  }
+  if (createForm.image_url.length > MAX_IMAGE_PAYLOAD) {
+    error.value = "Слишком большое изображение — вставьте ссылку или выберите файл меньше.";
+    return;
+  }
   try {
     await $fetch(`${config.public.apiBase}/products`, {
       method: "POST",
-      headers: authHeaders.value,
-      body: createForm
+      headers: { ...authHeaders.value, Accept: "application/json" },
+      body: { ...createForm }
     });
     resetCreateForm();
     await refreshProducts();
     info.value = "Товар добавлен";
   } catch (err) {
     if (await handleAuthError(err)) return;
-    error.value = "Не удалось добавить товар";
+    error.value = formatFetchDetail(err) || "Не удалось добавить товар";
   }
 }
 
@@ -141,10 +159,22 @@ async function updateProduct() {
   if (!editForm.id) return;
   info.value = "";
   error.value = "";
+  if (!auth.token?.trim()) {
+    error.value = "Сессия недействительна — войдите заново.";
+    return;
+  }
+  if (!editForm.name.trim()) {
+    error.value = "Укажите название товара.";
+    return;
+  }
+  if (editForm.image_url.length > MAX_IMAGE_PAYLOAD) {
+    error.value = "Слишком большое изображение.";
+    return;
+  }
   try {
     await $fetch(`${config.public.apiBase}/products/${editForm.id}`, {
       method: "PUT",
-      headers: authHeaders.value,
+      headers: { ...authHeaders.value, Accept: "application/json" },
       body: {
         name: editForm.name,
         description: editForm.description,
@@ -159,7 +189,7 @@ async function updateProduct() {
     cancelEdit();
   } catch (err) {
     if (await handleAuthError(err)) return;
-    error.value = "Не удалось обновить товар";
+    error.value = formatFetchDetail(err) || "Не удалось обновить товар";
   }
 }
 
@@ -167,31 +197,36 @@ async function deleteProduct(productId: number) {
   if (!confirm("Удалить товар?")) return;
   info.value = "";
   error.value = "";
+  if (!auth.token?.trim()) {
+    error.value = "Сессия недействительна — войдите заново.";
+    return;
+  }
   try {
     await $fetch(`${config.public.apiBase}/products/${productId}`, {
       method: "DELETE",
-      headers: authHeaders.value
+      headers: { ...authHeaders.value, Accept: "application/json" }
     });
     if (editForm.id === productId) cancelEdit();
     await refreshProducts();
     info.value = "Товар удалён";
   } catch (err) {
     if (await handleAuthError(err)) return;
-    error.value = "Не удалось удалить товар";
+    error.value = formatFetchDetail(err) || "Не удалось удалить товар";
   }
 }
 
 async function setStatus(orderId: number, status: string) {
+  if (!auth.token?.trim()) return;
   try {
     await $fetch(`${config.public.apiBase}/orders/${orderId}/status`, {
       method: "PATCH",
-      headers: authHeaders.value,
+      headers: { ...authHeaders.value, Accept: "application/json" },
       body: { status }
     });
     await refreshOrders();
   } catch (err) {
     if (await handleAuthError(err)) return;
-    error.value = "Не удалось обновить статус заказа";
+    error.value = formatFetchDetail(err) || "Не удалось обновить статус заказа";
   }
 }
 
@@ -226,7 +261,7 @@ watch(
           <h1>Панель управления</h1>
           <p>Служебный раздел администратора.</p>
         </div>
-        <button type="button" class="btn btn-secondary" @click="logoutRedirectHome">Выйти</button>
+        <button type="button" class="btn btn-secondary" @click="() => logoutRedirectHome()">Выйти</button>
       </div>
       <button type="button" class="btn" @click="openReport">Открыть отчёт тестов</button>
       <p v-if="info" class="ok-text">{{ info }}</p>
@@ -254,7 +289,7 @@ watch(
         :src="previewSrc(createForm.image_url, createForm.category, 777)"
         alt="Превью"
       />
-      <button class="btn" @click="addProduct">Добавить</button>
+      <button type="button" class="btn" @click="addProduct">Добавить</button>
     </section>
 
     <section ref="editSectionRef" class="card" v-if="editForm.id">
@@ -306,8 +341,8 @@ watch(
         <li v-for="o in orders || []" :key="o.id" class="list-item">
           <span>#{{ o.id }} - {{ o.status }} - {{ o.total }} ₽</span>
           <div class="action-row">
-            <button class="btn btn-secondary" @click="setStatus(o.id, 'готовится')">Готовится</button>
-            <button class="btn" @click="setStatus(o.id, 'доставлен')">Доставлен</button>
+            <button type="button" class="btn btn-secondary" @click="setStatus(o.id, 'готовится')">Готовится</button>
+            <button type="button" class="btn" @click="setStatus(o.id, 'доставлен')">Доставлен</button>
           </div>
         </li>
       </ul>
@@ -315,7 +350,7 @@ watch(
 
     <section class="card">
       <h2>Пользователи</h2>
-      <button class="btn" @click="refreshUsers">Обновить</button>
+      <button type="button" class="btn" @click="() => refreshUsers()">Обновить</button>
       <ul class="list mt-8">
         <li v-for="u in users || []" :key="u.id" class="list-item">{{ u.email }} - {{ u.role }}</li>
       </ul>

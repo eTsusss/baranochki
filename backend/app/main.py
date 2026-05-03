@@ -9,7 +9,13 @@ from .controllers.order_controller import router as order_router
 from .controllers.admin_controller import router as admin_router
 
 app = FastAPI(title="Confeti Baranochki API")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router)
 app.include_router(product_router)
 app.include_router(order_router)

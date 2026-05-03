@@ -19,8 +19,8 @@ const links = computed(() => [
   { to: "/profile", label: auth.token ? profileLabel.value : "Кабинет" }
 ]);
 
-async function logoutFromHeader() {
-  await logoutRedirectHome();
+function logoutFromHeader() {
+  logoutRedirectHome();
 }
 
 function toggleMenu() {
