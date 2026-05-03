@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import { logoutRedirectHome } from "~/composables/useLogout";
 import { joinApiBase } from "~/utils/api-url";
+import { loginLogoutPath } from "~/utils/login-url";
 import { decodeJwtPayload } from "../utils/jwt";
 
 definePageMeta({ middleware: "auth" });
@@ -21,6 +22,8 @@ const displayRole = computed(() =>
   jwtPayload.value?.role != null ? String(jwtPayload.value.role) : ""
 );
 const expandedOrderId = ref<number | null>(null);
+/** Явная ссылка + редирект: работает даже при сбое Vue-слушателя; href совпадает SSR/CSR */
+const logoutHref = computed(() => loginLogoutPath());
 
 const productsMap = computed(() => {
   const map = new Map<number, { name: string; weight: string }>();
@@ -74,9 +77,16 @@ useHead({
     <section class="card">
       <div class="section-head">
         <h1>Личный кабинет</h1>
-        <div class="action-row">
+        <div class="action-row profile-actions">
           <button type="button" class="btn btn-secondary" @click="() => refresh()">Обновить</button>
-          <button type="button" class="btn btn-danger" @click.stop.prevent="logout">Выйти</button>
+          <a
+            class="btn btn-danger"
+            role="button"
+            :href="logoutHref"
+            @click.prevent.stop="logout"
+          >
+            Выйти
+          </a>
         </div>
       </div>
 

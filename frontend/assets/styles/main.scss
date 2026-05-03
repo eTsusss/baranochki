@@ -290,6 +290,14 @@ input:focus, select:focus, textarea:focus {
 .btn-secondary { background: #666059; }
 .btn-danger { background: #af1d3a; }
 
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
 .link-secondary {
   font-size: 13px;
   color: #5d646e;
@@ -387,6 +395,13 @@ input:focus, select:focus, textarea:focus {
 .admin-edit-grid select,
 .admin-edit-grid textarea {
   pointer-events: auto;
+}
+
+/* Кнопки «Обновить / Выйти» над любым декоративным слоем страницы */
+.profile-actions {
+  position: relative;
+  z-index: 6;
+  flex-shrink: 0;
 }
 
 .profile-user-box {

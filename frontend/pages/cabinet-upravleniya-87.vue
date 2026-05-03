@@ -5,7 +5,7 @@ import { decodeJwtPayload } from "../utils/jwt";
 import { fetchHttpStatus, formatFetchDetail } from "../utils/http-error";
 import { joinApiBase } from "~/utils/api-url";
 import { browserJsonFetch } from "~/utils/browser-fetch";
-import { loginAbsoluteUrl } from "~/utils/login-url";
+import { loginLogoutPath } from "~/utils/login-url";
 
 definePageMeta({ middleware: "auth" });
 
@@ -253,7 +253,7 @@ watch(
        * Если LS уже без токена — полная перезагрузка на login; если токен ещё в LS — отработает auth.load/setToken.
        */
       if (!localStorage.getItem("token")) {
-        window.location.replace(loginAbsoluteUrl());
+        window.location.assign(loginLogoutPath());
       }
       return;
     }

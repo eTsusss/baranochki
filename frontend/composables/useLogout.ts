@@ -1,9 +1,8 @@
-import { loginAbsoluteUrl } from "~/utils/login-url";
+import { loginLogoutPath } from "~/utils/login-url";
 
 /**
- * Выход без вызова Pinia до редиректа: на админ-странице watcher на `auth.token` делал navigateTo('/login')
- * и конфликтовал с полной перезагрузкой — казалось, что кнопка «Выйти» не работает.
- * Чистим только хранилища и уходим через replace (не SPA).
+ * Выход без вызова Pinia до редиректа (см. watcher на админ-странице).
+ * Относительный путь — надёжнее абсолютного URL; навигация видна в Network как тип «document», не fetch.
  */
 export function logoutRedirectHome(): void {
   if (typeof window === "undefined") return;
@@ -15,5 +14,5 @@ export function logoutRedirectHome(): void {
     /* ignore */
   }
 
-  window.location.replace(loginAbsoluteUrl());
+  window.location.assign(loginLogoutPath());
 }
