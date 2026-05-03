@@ -17,7 +17,7 @@ async function submit() {
     });
     auth.setToken(res.access_token);
     const role = decodeJwtPayload(res.access_token)?.role;
-    navigateTo(role === "admin" ? "/cabinet-upravleniya-87" : "/profile");
+    await navigateTo(role === "admin" ? "/cabinet-upravleniya-87" : "/profile", { replace: true });
   } catch {
     error.value = "Неверный логин или пароль";
   }
@@ -37,7 +37,7 @@ async function submit() {
         </select>
         <input v-model="email" placeholder="Email" />
         <input v-model="password" type="password" placeholder="Пароль" />
-        <button class="btn" @click="submit">Продолжить</button>
+        <button type="button" class="btn" @click="submit">Продолжить</button>
       </div>
       <p class="err-text" v-if="error">{{ error }}</p>
     </section>

@@ -34,9 +34,8 @@ function itemWeight(productId: number) {
   return productsMap.value.get(Number(productId))?.weight || "";
 }
 
-function logout() {
-  auth.logout();
-  navigateTo("/");
+async function logout() {
+  await logoutRedirectHome();
 }
 
 watch(
@@ -68,8 +67,8 @@ useHead({
       <div class="section-head">
         <h1>Личный кабинет</h1>
         <div class="action-row">
-          <button class="btn btn-secondary" @click="refresh">Обновить</button>
-          <button class="btn btn-danger" @click="logout">Выйти</button>
+          <button type="button" class="btn btn-secondary" @click="refresh">Обновить</button>
+          <button type="button" class="btn btn-danger" @click="logout">Выйти</button>
         </div>
       </div>
 

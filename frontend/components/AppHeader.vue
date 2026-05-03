@@ -19,6 +19,10 @@ const links = computed(() => [
   { to: "/profile", label: auth.token ? profileLabel.value : "Кабинет" }
 ]);
 
+async function logoutFromHeader() {
+  await logoutRedirectHome();
+}
+
 function toggleMenu() {
   mobileOpen.value = !mobileOpen.value;
 }
@@ -84,6 +88,14 @@ onBeforeUnmount(() => {
           {{ item.label }}
           <span v-if="item.to === '/cart' && cart.count" class="site-nav__badge">{{ cart.count }}</span>
         </NuxtLink>
+        <button
+          v-if="auth.token"
+          type="button"
+          class="site-nav__link site-nav__link--logout"
+          @click="logoutFromHeader"
+        >
+          Выйти
+        </button>
       </nav>
     </div>
   </header>

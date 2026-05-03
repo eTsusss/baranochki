@@ -54,11 +54,11 @@ const error = ref("");
 const editSectionRef = ref<HTMLElement | null>(null);
 const editNameInputRef = ref<HTMLInputElement | null>(null);
 
-function handleAuthError(err: unknown): boolean {
+async function handleAuthError(err: unknown): Promise<boolean> {
   const status = (err as FetchError)?.statusCode || (err as FetchError)?.response?.status;
   if (status === 401 || status === 403) {
     auth.logout();
-    navigateTo("/login");
+    await navigateTo("/login", { replace: true });
     return true;
   }
   return false;
@@ -131,7 +131,7 @@ async function addProduct() {
     await refreshProducts();
     info.value = "Товар добавлен";
   } catch (err) {
-    if (handleAuthError(err)) return;
+    if (await handleAuthError(err)) return;
     error.value = "Не удалось добавить товар";
   }
 }
@@ -157,7 +157,7 @@ async function updateProduct() {
     info.value = "Товар обновлён";
     cancelEdit();
   } catch (err) {
-    if (handleAuthError(err)) return;
+    if (await handleAuthError(err)) return;
     error.value = "Не удалось обновить товар";
   }
 }
@@ -175,7 +175,7 @@ async function deleteProduct(productId: number) {
     await refreshProducts();
     info.value = "Товар удалён";
   } catch (err) {
-    if (handleAuthError(err)) return;
+    if (await handleAuthError(err)) return;
     error.value = "Не удалось удалить товар";
   }
 }
@@ -189,7 +189,7 @@ async function setStatus(orderId: number, status: string) {
     });
     await refreshOrders();
   } catch (err) {
-    if (handleAuthError(err)) return;
+    if (await handleAuthError(err)) return;
     error.value = "Не удалось обновить статус заказа";
   }
 }
@@ -201,9 +201,13 @@ function openReport() {
 watch(
   () => auth.token,
   async (token) => {
-    if (!token || !isAdmin.value) {
-      auth.logout();
-      navigateTo("/login");
+    if (!token) {
+      await navigateTo("/login");
+      return;
+    }
+    if (!isAdmin.value) {
+      /* Не вызывать logout: иначе обычный пользователь терял сессию при заходе на URL админки */
+      await navigateTo("/");
       return;
     }
     await Promise.all([refreshOrders(), refreshUsers()]);
@@ -215,9 +219,14 @@ watch(
 <template>
   <main class="container page">
     <section class="card">
-      <h1>Панель управления</h1>
-      <p>Служебный раздел администратора.</p>
-      <button class="btn" @click="openReport">Открыть отчёт тестов</button>
+      <div class="section-head">
+        <div>
+          <h1>Панель управления</h1>
+          <p>Служебный раздел администратора.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" @click="logoutRedirectHome">Выйти</button>
+      </div>
+      <button type="button" class="btn" @click="openReport">Открыть отчёт тестов</button>
       <p v-if="info" class="ok-text">{{ info }}</p>
       <p v-if="error" class="err-text">{{ error }}</p>
     </section>
