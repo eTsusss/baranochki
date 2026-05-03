@@ -5,6 +5,7 @@ import { decodeJwtPayload } from "../utils/jwt";
 import { fetchHttpStatus, formatFetchDetail } from "../utils/http-error";
 import { joinApiBase } from "~/utils/api-url";
 import { browserJsonFetch } from "~/utils/browser-fetch";
+import { loginAbsoluteUrl } from "~/utils/login-url";
 
 definePageMeta({ middleware: "auth" });
 
@@ -247,7 +248,13 @@ watch(
     /* На SSR токена нет — иначе immediate срабатывает с token === "" и уводит на /login до гидратации */
     if (import.meta.server) return;
     if (!token) {
-      await navigateTo("/login", { replace: true });
+      /*
+       * Не используем navigateTo: конфликтует с «Выйти» (location.replace из useLogout).
+       * Если LS уже без токена — полная перезагрузка на login; если токен ещё в LS — отработает auth.load/setToken.
+       */
+      if (!localStorage.getItem("token")) {
+        window.location.replace(loginAbsoluteUrl());
+      }
       return;
     }
     if (!isAdmin.value) {
