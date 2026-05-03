@@ -14,7 +14,12 @@ const { data: orders, refresh } = await useFetch(joinApiBase(config.public.apiPr
 });
 const { data: products } = await useFetch(joinApiBase(config.public.apiPrefix, "products"));
 
-const user = computed(() => decodeJwtPayload(auth.token || "") || {});
+/** Не смешиваем «Гость» с запасной ролью user — только данные из валидного JWT */
+const jwtPayload = computed(() => decodeJwtPayload(auth.token || ""));
+const displayEmail = computed(() => (jwtPayload.value?.sub as string | undefined)?.trim() || "");
+const displayRole = computed(() =>
+  jwtPayload.value?.role != null ? String(jwtPayload.value.role) : ""
+);
 const expandedOrderId = ref<number | null>(null);
 
 const productsMap = computed(() => {
@@ -76,8 +81,8 @@ useHead({
       </div>
 
       <div class="profile-user-box">
-        <p><b>Пользователь:</b> {{ user.sub || "Гость" }}</p>
-        <p><b>Роль:</b> {{ user.role || "user" }}</p>
+        <p><b>Пользователь:</b> {{ displayEmail || "не авторизован" }}</p>
+        <p><b>Роль:</b> {{ displayRole || "—" }}</p>
       </div>
 
       <ul class="list" v-if="orders?.length">

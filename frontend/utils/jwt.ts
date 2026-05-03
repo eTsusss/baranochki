@@ -22,3 +22,12 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
     return null;
   }
 }
+
+/** JWT `exp` в секундах (UTC); без валидного exp не считаем просроченным. */
+export function isJwtExpired(payload: Record<string, unknown>): boolean {
+  const raw = payload.exp;
+  const expSec =
+    typeof raw === "number" ? raw : typeof raw === "string" ? Number.parseFloat(raw) : Number.NaN;
+  if (!Number.isFinite(expSec)) return false;
+  return Date.now() >= expSec * 1000;
+}

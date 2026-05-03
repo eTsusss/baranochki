@@ -1,14 +1,25 @@
 import { defineStore } from "pinia";
-import { decodeJwtPayload } from "../utils/jwt";
+import { decodeJwtPayload, isJwtExpired } from "../utils/jwt";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({ token: "", role: "guest" }),
   actions: {
     setToken(token: string) {
-      this.token = token;
-      const payload = decodeJwtPayload(token);
-      this.role = payload?.role || "user";
-      if (process.client) localStorage.setItem("token", token);
+      const trimmed = token.trim();
+      if (!trimmed) {
+        this.logout();
+        return;
+      }
+      const payload = decodeJwtPayload(trimmed);
+      if (!payload || isJwtExpired(payload)) {
+        this.token = "";
+        this.role = "guest";
+        if (process.client) localStorage.removeItem("token");
+        return;
+      }
+      this.token = trimmed;
+      this.role = typeof payload.role === "string" ? payload.role : "user";
+      if (process.client) localStorage.setItem("token", trimmed);
     },
     load() {
       if (!process.client) return;
