@@ -1,14 +1,17 @@
 export default defineNuxtConfig({
   ssr: true,
+  experimental: {
+    appManifest: false
+  },
   css: ["~/assets/styles/main.scss"],
-  modules: ["@pinia/nuxt"],
+  modules: ["./modules/fix-nitro-public-assets", "@pinia/nuxt"],
   vite: {
     build: {
       cssMinify: true
     }
   },
   nitro: {
-    compressPublicAssets: true
+    compressPublicAssets: false
   },
   routeRules: {
     "/_nuxt/**": {

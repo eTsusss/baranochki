@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "nuxt dev",
-    "build": "nuxt build",
+    "build": "nuxt build && shx cp -r .output/public/. .output/server/chunks/public/",
     "start": "nuxt start",
     "test:unit": "vitest run --reporter=verbose",
     "test:unit:coverage": "vitest run --coverage --reporter=verbose --coverage.reporter=text --coverage.reporter=json-summary",
@@ -25,6 +25,7 @@
     "@types/node": "^22.7.4",
     "@vitest/coverage-v8": "^2.1.2",
     "sass": "^1.79.5",
+    "shx": "^0.3.4",
     "vitest": "^2.1.2"
   }
 }

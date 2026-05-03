@@ -59,17 +59,17 @@ async function submit() {
       <h1>Вход / Регистрация</h1>
       <p>Введите данные учётной записи для входа в личный кабинет.</p>
 
-      <div class="form-stack">
+      <form class="form-stack" @submit.prevent="submit">
         <select v-model="mode">
           <option value="login">Вход</option>
           <option value="register">Регистрация</option>
         </select>
-        <input v-model="email" placeholder="Email" />
-        <input v-model="password" type="password" placeholder="Пароль" />
-        <button type="button" class="btn" :disabled="loading" @click="submit">
+        <input v-model="email" placeholder="Email" autocomplete="username" />
+        <input v-model="password" type="password" placeholder="Пароль" autocomplete="current-password" />
+        <button type="submit" class="btn" :disabled="loading">
           {{ loading ? "…" : "Продолжить" }}
         </button>
-      </div>
+      </form>
       <p class="err-text" v-if="error">{{ error }}</p>
     </section>
   </main>
