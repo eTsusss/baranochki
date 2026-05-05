@@ -43,7 +43,11 @@
 
     <div class="container site-footer__bottom">
       <small>© {{ new Date().getFullYear() }} Конфетки - бараночки. Все права защищены.</small>
-      <small>Политика конфиденциальности</small>
+      <small>
+        <NuxtLink to="/privacy-policy">Политика обработки персональных данных</NuxtLink>
+        ·
+        <NuxtLink to="/offer">Публичная оферта</NuxtLink>
+      </small>
     </div>
   </footer>
 </template>

@@ -7,6 +7,7 @@ const auth = useAuthStore();
 const mode = ref<"login" | "register">("login");
 const email = ref("admin@example.com");
 const password = ref("admin");
+const consentAccepted = ref(false);
 const error = ref("");
 const loading = ref(false);
 
@@ -32,6 +33,10 @@ function formatLoginError(e: unknown): string {
 
 async function submit() {
   error.value = "";
+  if (mode.value === "register" && !consentAccepted.value) {
+    error.value = "Для регистрации нужно согласие на обработку персональных данных.";
+    return;
+  }
   loading.value = true;
   try {
     const res = await $fetch<{ access_token: string }>(joinApiBase(config.public.apiPrefix, "auth", mode.value), {
@@ -66,6 +71,13 @@ async function submit() {
         </select>
         <input v-model="email" placeholder="Email" autocomplete="username" />
         <input v-model="password" type="password" placeholder="Пароль" autocomplete="current-password" />
+        <label v-if="mode === 'register'" class="check-row login-consent">
+          <input v-model="consentAccepted" type="checkbox" />
+          <span>
+            Я даю согласие на обработку персональных данных и принимаю
+            <NuxtLink to="/privacy-policy">политику обработки персональных данных</NuxtLink>.
+          </span>
+        </label>
         <button type="submit" class="btn" :disabled="loading">
           {{ loading ? "…" : "Продолжить" }}
         </button>
