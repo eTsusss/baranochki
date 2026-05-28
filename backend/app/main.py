@@ -34,54 +34,65 @@ def _fallback_image(category: str, idx: int) -> str:
 def startup():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+    test_product_names = {
+        "Трюфельный набор",
+        "Карамель с морской солью",
+        "Бараночки медовые",
+        "Бараночки с маком",
+        "Капкейк ванильный",
+        "Капкейк ягодный",
+        "Набор конфет",
+        "Candy",
+    }
+    db.query(Product).filter(Product.name.in_(test_product_names)).delete(synchronize_session=False)
     seed_products = [
         Product(
-            name="Трюфельный набор",
-            description="Тёмный шоколад с бархатной текстурой и какао.",
-            price=390,
-            image_url="/images/products/candies.svg",
-            weight="180 г",
+            name="Кофе Ambassador Gold",
+            description="Сбалансированный растворимый кофе с мягким вкусом, деликатной горчинкой и насыщенным ароматом для ежедневных кофейных пауз.",
+            price=490,
+            image_url="/images/ambassador/photo_2025-02-19_16-31-54.jpg",
+            weight="95 г",
             category="candies"
         ),
         Product(
-            name="Карамель с морской солью",
-            description="Мягкие конфеты с солёной карамельной начинкой.",
-            price=320,
-            image_url="/images/products/candies.svg",
-            weight="160 г",
+            name="Чай Basilur Ассорти",
+            description="Коллекция цейлонского чая с ярким ароматическим профилем и благородным вкусом. Отлично подходит для подарка и уютных чаепитий.",
+            price=650,
+            image_url="/images/basilur/photo_2026-03-06_12-32-08.jpg",
+            weight="100 г",
             category="candies"
         ),
         Product(
-            name="Бараночки медовые",
-            description="Румяные бараночки с лёгкой медовой глазурью.",
-            price=210,
-            image_url="/images/products/baranochki.svg",
-            weight="220 г",
-            category="baranochki"
+            name="Чай Basilur Премиум",
+            description="Премиальный листовой чай с выразительными нотами и плотным послевкусием. Идеален для спокойного вечернего чаепития.",
+            price=690,
+            image_url="/images/basilur2/photo_2026-02-23_13-07-46.jpg",
+            weight="100 г",
+            category="candies"
         ),
         Product(
-            name="Бараночки с маком",
-            description="Хрустящие бараночки для чая с ароматным маком.",
-            price=220,
-            image_url="/images/products/baranochki.svg",
-            weight="210 г",
-            category="baranochki"
+            name="Кофе Carte Noire Original",
+            description="Ароматный кофе с глубоким обжаренным вкусом и шоколадными нюансами. Подходит для приготовления насыщенного утреннего напитка.",
+            price=520,
+            image_url="/images/carteNoire/photo_2026-03-08_12-45-49.jpg",
+            weight="95 г",
+            category="candies"
         ),
         Product(
-            name="Капкейк ванильный",
-            description="Ванильный бисквит с кремом и ягодным декором.",
-            price=190,
-            image_url="/images/products/cupcakes.svg",
-            weight="110 г",
-            category="cupcakes"
+            name="Кофе Carte Noire Intense",
+            description="Интенсивный кофе с плотным телом и выразительным послевкусием. Хороший выбор для тех, кто любит яркий и крепкий вкус.",
+            price=540,
+            image_url="/images/carteNoire2/photo_2026-03-08_12-44-14.jpg",
+            weight="95 г",
+            category="candies"
         ),
         Product(
-            name="Капкейк ягодный",
-            description="Нежный капкейк с ягодным кремом и хрустящей крошкой.",
-            price=200,
-            image_url="/images/products/cupcakes.svg",
-            weight="115 г",
-            category="cupcakes"
+            name="Кофе Monarch Classic",
+            description="Классический кофе с мягкой обжаркой и приятным ароматом. Универсальный вариант для дома и офиса на каждый день.",
+            price=470,
+            image_url="/images/monarch/photo_2025-10-03_19-33-44.jpg",
+            weight="95 г",
+            category="candies"
         ),
     ]
 
@@ -95,12 +106,6 @@ def startup():
             p.image_url = _fallback_image(p.category, p.id)
         if p.price < 100:
             p.price = round(p.price * 18)
-        if p.name == "Candy":
-            p.name = "Набор конфет"
-            p.description = "Ассорти конфет ручной работы"
-            p.weight = "150 г"
-            p.category = "candies"
-            p.image_url = _fallback_image("candies", p.id)
     if not db.query(User).filter(User.email == "admin@example.com").first():
         db.add(User(email="admin@example.com", hashed_password=hash_password("admin"), role="admin"))
     db.commit()

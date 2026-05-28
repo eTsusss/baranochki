@@ -47,14 +47,14 @@ let processTimer: ReturnType<typeof setInterval> | null = null;
 let popularTimer: ReturnType<typeof setInterval> | null = null;
 const sliderHovered = ref(false);
 const popularTrack = computed(() => [...topProducts.value, ...topProducts.value]);
-const storyImage = productFallbackImage("candies", 901);
+const storyImage = "/images/ambassador/photo_2025-02-19_16-31-55.jpg";
 const instaImages = [
-  productFallbackImage("candies", 1001),
-  productFallbackImage("baranochki", 1002),
-  productFallbackImage("cupcakes", 1003),
-  productFallbackImage("candies", 1004),
-  productFallbackImage("baranochki", 1005),
-  productFallbackImage("cupcakes", 1006)
+  "/images/ambassador/photo_2025-02-19_16-31-56.jpg",
+  "/images/basilur/photo_2026-03-06_12-32-47.jpg",
+  "/images/basilur2/photo_2026-02-23_13-08-01.jpg",
+  "/images/carteNoire/photo_2026-03-08_12-46-00.jpg",
+  "/images/carteNoire2/photo_2026-03-08_12-44-45.jpg",
+  "/images/monarch/photo_2025-10-03_19-33-46.jpg"
 ];
 
 function nextHero() {
@@ -188,7 +188,7 @@ useHead({
         </transition>
       </article>
       <article class="card story-photo">
-        <img :src="storyImage" alt="Процесс приготовления" loading="lazy" @error="fallbackFor($event, 'candies', 901)" />
+        <img :src="storyImage" alt="Популярный товар" loading="lazy" @error="fallbackFor($event, 'candies', 901)" />
       </article>
     </section>
 
@@ -210,7 +210,7 @@ useHead({
           v-for="(img, idx) in instaImages"
           :key="idx"
           :src="img"
-          alt="Фото десерта"
+          alt="Фото товара"
           loading="lazy"
           @error="fallbackFor($event, 'candies', 2000 + idx)"
         />
