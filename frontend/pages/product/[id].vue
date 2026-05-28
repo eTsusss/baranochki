@@ -14,16 +14,21 @@ const relatedOffset = ref(0);
 
 const gallery = computed(() => {
   if (!product.value) return [];
+  const apiGallery = (product.value.image_gallery || []).filter((url) => isValidImageUrl(url));
+  if (apiGallery.length) return apiGallery;
   const base = isValidImageUrl(product.value.image_url)
     ? product.value.image_url
     : productFallbackImage(product.value.category, product.value.id);
-  return [
-    base,
-    productFallbackImage(product.value.category, product.value.id + 10),
-    productFallbackImage(product.value.category, product.value.id + 20)
-  ];
+  return [base];
 });
 const activeImage = ref(0);
+
+watch(
+  () => product.value?.id,
+  () => {
+    activeImage.value = 0;
+  }
+);
 
 const related = computed(() => {
   if (!product.value) return [];

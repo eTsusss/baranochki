@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import List
 
 class RegisterRequest(BaseModel):
@@ -23,6 +23,7 @@ class ProductIn(BaseModel):
 
 class ProductOut(ProductIn):
     id: int
+    image_gallery: List[str] = Field(default_factory=list)
     class Config:
         from_attributes = True
 
