@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..deps import admin_required
@@ -17,12 +17,30 @@ LEGACY_TEST_PRODUCT_NAMES = {
     "Candy",
 }
 
+
+def _to_absolute_image_url(request: Request, image_url: str) -> str:
+    if not image_url:
+        return image_url
+    if image_url.startswith("http://") or image_url.startswith("https://") or image_url.startswith("data:image/"):
+        return image_url
+    if image_url.startswith("/"):
+        return f"{str(request.base_url).rstrip('/')}{image_url}"
+    return image_url
+
 @router.get("", response_model=list[ProductOut])
-def list_products(category: str | None = None, db: Session = Depends(get_db)):
-    q = db.query(Product).filter(~Product.name.in_(LEGACY_TEST_PRODUCT_NAMES))
+def list_products(request: Request, category: str | None = None, db: Session = Depends(get_db)):
+    q = (
+        db.query(Product)
+        .filter(~Product.name.in_(LEGACY_TEST_PRODUCT_NAMES))
+        .filter(~Product.image_url.like("/images/products/%"))
+        .filter(~Product.image_url.like("data:image/%"))
+    )
     if category:
         q = q.filter(Product.category == category)
-    return q.all()
+    products = q.all()
+    for product in products:
+        product.image_url = _to_absolute_image_url(request, product.image_url)
+    return products
 
 @router.post("", response_model=ProductOut)
 def create_product(payload: ProductIn, db: Session = Depends(get_db), _=Depends(admin_required)):

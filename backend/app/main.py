@@ -1,5 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from .database import Base, engine, SessionLocal
 from .models import Product, User, OrderItem
 from .auth import hash_password
@@ -20,6 +22,21 @@ app.include_router(auth_router)
 app.include_router(product_router)
 app.include_router(order_router)
 app.include_router(admin_router)
+
+
+def _resolve_images_dir() -> Path | None:
+    backend_images = Path(__file__).resolve().parent.parent / "public" / "images"
+    frontend_images = Path(__file__).resolve().parent.parent.parent / "frontend" / "public" / "images"
+    if backend_images.exists():
+        return backend_images
+    if frontend_images.exists():
+        return frontend_images
+    return None
+
+
+_images_dir = _resolve_images_dir()
+if _images_dir is not None:
+    app.mount("/images", StaticFiles(directory=str(_images_dir)), name="images")
 
 def _fallback_image(category: str, idx: int) -> str:
     if category == "candies":
