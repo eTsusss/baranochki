@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine, SessionLocal
-from .models import Product, User
+from .models import Product, User, OrderItem
 from .auth import hash_password
 from .controllers.auth_controller import router as auth_router
 from .controllers.product_controller import router as product_router
@@ -44,7 +44,11 @@ def startup():
         "Набор конфет",
         "Candy",
     }
-    db.query(Product).filter(Product.name.in_(test_product_names)).delete(synchronize_session=False)
+    used_product_ids = {product_id for (product_id,) in db.query(OrderItem.product_id).distinct().all() if product_id is not None}
+    removable_test_products = db.query(Product).filter(Product.name.in_(test_product_names))
+    if used_product_ids:
+        removable_test_products = removable_test_products.filter(~Product.id.in_(used_product_ids))
+    removable_test_products.delete(synchronize_session=False)
     seed_products = [
         Product(
             name="Кофе Ambassador Gold",
