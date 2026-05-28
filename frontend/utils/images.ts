@@ -33,5 +33,7 @@ export function isValidImageUrl(url: string) {
   if (url.includes("via.placeholder.com")) return false;
   if (url.startsWith("data:image/")) return true;
   if (url.startsWith("https://") || url.startsWith("http://")) return true;
+  if (url.startsWith("/")) return true;
+  if (url.startsWith("./") || url.startsWith("../")) return true;
   return false;
 }

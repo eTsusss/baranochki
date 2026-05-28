@@ -6,10 +6,20 @@ from ..models import Product
 from ..schemas import ProductIn, ProductOut
 
 router = APIRouter(prefix="/api/products", tags=["products"])
+LEGACY_TEST_PRODUCT_NAMES = {
+    "Трюфельный набор",
+    "Карамель с морской солью",
+    "Бараночки медовые",
+    "Бараночки с маком",
+    "Капкейк ванильный",
+    "Капкейк ягодный",
+    "Набор конфет",
+    "Candy",
+}
 
 @router.get("", response_model=list[ProductOut])
 def list_products(category: str | None = None, db: Session = Depends(get_db)):
-    q = db.query(Product)
+    q = db.query(Product).filter(~Product.name.in_(LEGACY_TEST_PRODUCT_NAMES))
     if category:
         q = q.filter(Product.category == category)
     return q.all()
